@@ -44,7 +44,7 @@ D:\Meridian\
     └── WelcomeIntent\
 ```
 
-> En v1.0.7, ces chemins sont entièrement personnalisables depuis **⚙ Paramètres → Emplacement de stockage**.
+> En v1.0.7+, ces chemins sont entièrement personnalisables depuis **⚙ Paramètres → Emplacement de stockage**.
 
 ---
 
@@ -68,6 +68,21 @@ python src/main.py
 - Ouvrir un terminal `cmd` positionné sur le dossier
 - Ouvrir VS Code dans le dossier
 
+### Connexion compte GitHub (v1.0.8) 🆕
+- **Connexion via OAuth Device Flow** — aucun token à coller, authentification dans le navigateur
+- Le compte connecté apparaît dans la sidebar avec son login GitHub
+- **Token OAuth réutilisé automatiquement** pour toutes les instances liées à GitHub
+- Option de protection du token OAuth par mot de passe (Whirlpool + XOR)
+- Déconnexion propre depuis la sidebar ou le menu **🐙 GitHub**
+- Restauration automatique de la session au démarrage
+
+#### Priorité des tokens lors d'un push
+| Situation | Token utilisé |
+|---|---|
+| Instance avec PAT spécifique | PAT de l'instance (prioritaire) |
+| Instance sans PAT + compte connecté | Token OAuth du compte GitHub |
+| Aucun token | Push en mode public uniquement |
+
 ### GitHub (instances uniquement)
 - Lier un repository GitHub (sauvegardé dans `data/config.json`)
 - Git Init local
@@ -76,6 +91,7 @@ python src/main.py
 - Options : `--force`, `--follow-tags`, `--no-verify`
 - Option : lier sans pousser (décocher "Push initial")
 - Chiffrement du token PAT : Whirlpool + XOR (SHA-512 en fallback)
+- Dialog de configuration affiche le compte OAuth connecté si disponible
 
 ### Emplacement de stockage personnalisé (v1.0.7)
 - Choisir un dossier arbitraire pour stocker les Instances et les Intents
@@ -83,7 +99,7 @@ python src/main.py
 - Configurable via **⚙ Paramètres → Emplacement de stockage**
 - Rétro-compatible : laisser vide pour garder le comportement `{Disque}\Meridian\...`
 
-### Diagnostic & Réparation automatique (v1.0.7)
+### Diagnostic & Réparation automatique (v1.0.7+)
 Détection automatique de problèmes au démarrage et via **⚙ Paramètres → Lancer un diagnostic** :
 
 | Problème détecté | Catégorie | Action automatique |
@@ -92,14 +108,47 @@ Détection automatique de problèmes au démarrage et via **⚙ Paramètres → 
 | Entrées pointant vers des dossiers absents | `data` | Suppression des entrées orphelines |
 | `git` absent du PATH | `dependency` | Lien vers le téléchargement |
 | `PySide6` manquant | `dependency` | Réinstallation via `pip` |
-
-- **Données** : tentative de récupération maximale, archive de l'ancien fichier en `.bak`
-- **Dépendances** : réinstallation sans toucher aux données utilisateur
-- **Échec** : diagnostic clair affiché avec le détail de l'erreur
+| Client ID OAuth non configuré | `config` | Avertissement (v1.0.8) |
 
 ### Project Builder
 - Lance `Project_Builder.exe` dans un terminal `cmd`
 - Répertoire de travail positionné sur le dossier sélectionné
+
+---
+
+## Configuration de l'OAuth GitHub (v1.0.8)
+
+### 1. Créer une OAuth App
+
+1. Allez sur https://github.com/settings/developers
+2. Cliquez **"New OAuth App"**
+3. Remplissez :
+   - **Application name** : Meridian
+   - **Homepage URL** : `http://localhost` (non utilisée)
+   - **Authorization callback URL** : `http://localhost` (non utilisée avec Device Flow)
+4. Cochez **"Enable Device Flow"** (important !)
+5. Cliquez **"Register application"**
+6. Copiez le **Client ID** affiché
+
+### 2. Configurer Meridian
+
+Ouvrez `src/core.py` et remplacez :
+
+```python
+GITHUB_CLIENT_ID = "Iv23liYOUR_CLIENT_ID"   # ← À remplacer
+```
+
+par votre Client ID :
+
+```python
+GITHUB_CLIENT_ID = "Iv23liAbCdEfGhIjKl"    # ← Votre vrai Client ID
+```
+
+> ⚠  Ne générez **pas** de Client Secret — le Device Flow n'en a pas besoin.  
+> ⚠  Ne committez pas votre Client ID dans un repo public.
+
+### Scopes demandés
+`repo` — accès complet aux repos publics et privés (lecture + écriture).
 
 ---
 
@@ -157,6 +206,27 @@ def get_app_dir() -> Path:
         return Path(__file__).resolve().parent.parent
 ```
 
+### OAuth Device Flow (v1.0.8)
+
+Le Device Flow est le seul flux OAuth qui fonctionne sans serveur web ni callback URL.
+
+```
+1. POST /login/device/code       → device_code + user_code + verification_uri
+2. Affichage du user_code dans l'UI
+3. L'utilisateur visite verification_uri et entre le code
+4. Sondage de POST /login/oauth/access_token toutes les N secondes
+5. Réponse : access_token (token OAuth)
+6. GET /api/user                 → login, name, avatar_url
+7. Sauvegarde dans config.json (token optionnellement chiffré)
+```
+
+### Priorité des tokens (v1.0.8)
+
+`core.get_effective_token(instance_path)` applique la règle :
+1. PAT spécifique à l'instance (vault de session ou config)
+2. Token OAuth du compte GitHub connecté (session mémoire)
+3. Chaîne vide (repos publics)
+
 ### Cache avec functools (v1.0.7)
 
 Les fonctions pures (chemins, disponibilité Whirlpool) sont mises en cache via `@functools.cache` pour éviter les appels répétés au système de fichiers.  
@@ -173,15 +243,28 @@ Chaque nom d'instance ou d'intent est validé avant création (`core.validate_na
 - Sans caractères réservés Windows : `\ / : * ? " < > |`
 - Sans séquences de traversée de chemin (`..`)
 
-### Rétro-compatibilité (v1.0.7)
+### Rétro-compatibilité
 
 `config.json` est migré automatiquement depuis toutes les versions antérieures :
 - v1.0.5 → v1.0.6 : ajout de `github_branches`, `github_token_protected`
-- v1.0.6 → v1.0.7 : ajout de `storage` (emplacements personnalisés), `_schema_version`
+- v1.0.6 → v1.0.7 : ajout de `storage`, `_schema_version`
+- v1.0.7 → v1.0.8 : ajout de `github_account` (session OAuth)
 
 ---
 
 ## Changelog
+
+### v1.0.8
+- 🐙 **Connexion compte GitHub** via OAuth Device Flow (sans coller de token)
+- 🔑 Token OAuth persisté dans `config.json` (chiffrable par mot de passe)
+- 🔄 Restauration automatique de la session au démarrage
+- 🃏 Carte de compte GitHub dans la sidebar (login, statut, déconnexion)
+- 📋 Indicateur de source du token dans le panneau d'instance
+- ⚡ `get_effective_token()` : priorité PAT instance > OAuth global
+- 🩺 Avertissement diagnostic si `GITHUB_CLIENT_ID` non configuré
+- 🔒 Token OAuth optionnellement chiffré (même algo Whirlpool + XOR)
+- 🧵 `OAuthPollWorker` : sondage non-bloquant dans un QThread dédié
+- Migration automatique `config.json` vers schéma v3
 
 ### v1.0.7
 - ✨ Emplacement de stockage personnalisable (instances et intents)
