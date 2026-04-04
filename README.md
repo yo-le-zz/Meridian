@@ -1,11 +1,11 @@
-# ✦ Meridian — Project Instance Manager v1.0.9
+# ✦ Meridian — Project Instance Manager v1.1.0
 
 > **Gestionnaire de dossiers de projets pour Windows.**  
 > Créez, organisez et versionez vos instances et intents sur n'importe quel disque,  
 > avec intégration GitHub, export/import ZIP, chiffrement des tokens PAT et thèmes personnalisés.
 > 
 > **Auteur : yo-le-zz**  
-> **Version : 1.0.9**  
+> **Version : 1.1.0**  
 
 ---
 
@@ -47,7 +47,7 @@ D:\Meridian\
     └── WelcomeIntent\
 ```
 
-> En v1.0.7+, ces chemins sont entièrement personnalisables depuis **⚙ Paramètres → Emplacement de stockage**.
+> En v1.1.0+, ces chemins sont entièrement personnalisables depuis **⚙ Paramètres → Emplacement de stockage**.
 
 ---
 
@@ -71,7 +71,7 @@ python src/main.py
 - Ouvrir un terminal `cmd` positionné sur le dossier
 - Ouvrir VS Code dans le dossier
 
-### Connexion compte GitHub (v1.0.8) 🆕
+### Connexion compte GitHub (v1.1.0) 🆕
 - **Connexion via OAuth Device Flow** — aucun token à coller, authentification dans le navigateur
 - Le compte connecté apparaît dans la sidebar avec son login GitHub
 - **Token OAuth réutilisé automatiquement** pour toutes les instances liées à GitHub
@@ -96,13 +96,13 @@ python src/main.py
 - Chiffrement du token PAT : Whirlpool + XOR (SHA-512 en fallback)
 - Dialog de configuration affiche le compte OAuth connecté si disponible
 
-### Emplacement de stockage personnalisé (v1.0.7)
+### Emplacement de stockage personnalisé (v1.1.0)
 - Choisir un dossier arbitraire pour stocker les Instances et les Intents
 - Indépendant du disque sélectionné dans la barre latérale
 - Configurable via **⚙ Paramètres → Emplacement de stockage**
 - Rétro-compatible : laisser vide pour garder le comportement `{Disque}\Meridian\...`
 
-### Diagnostic & Réparation automatique (v1.0.7+)
+### Diagnostic & Réparation automatique (v1.1.0+)
 Détection automatique de problèmes au démarrage et via **⚙ Paramètres → Lancer un diagnostic** :
 
 | Problème détecté | Catégorie | Action automatique |
@@ -111,7 +111,7 @@ Détection automatique de problèmes au démarrage et via **⚙ Paramètres → 
 | Entrées pointant vers des dossiers absents | `data` | Suppression des entrées orphelines |
 | `git` absent du PATH | `dependency` | Lien vers le téléchargement |
 | `PySide6` manquant | `dependency` | Réinstallation via `pip` |
-| Client ID OAuth non configuré | `config` | Avertissement (v1.0.8) |
+| Client ID OAuth non configuré | `config` | Avertissement (v1.1.0) |
 
 ### Project Builder
 - Lance `Project_Builder.exe` dans un terminal `cmd`
@@ -119,7 +119,7 @@ Détection automatique de problèmes au démarrage et via **⚙ Paramètres → 
 
 ---
 
-## Configuration de l'OAuth GitHub (v1.0.8)
+## Configuration de l'OAuth GitHub (v1.1.0)
 
 ### 1. Créer une OAuth App
 
@@ -165,7 +165,7 @@ Pour modifier : éditer `PROJECT_BUILDER` dans `src/core.py`.
 
 ---
 
-## Compilation Nuitka v1.0.9
+## Compilation Nuitka v1.1.0
 
 ### 🚀 Script PowerShell recommandé
 
@@ -242,13 +242,20 @@ pip install nuitka PySide6
 
 Compilateur C requis : **Visual Studio Build Tools** ou **MinGW-w64**.
 
-### 🎯 Nouveautés v1.0.9
+### 🎯 Nouveautés v1.1.0
 
 - 🎨 **Système de thèmes personnalisés** avec création, modification et suppression
 - 🌈 **5 thèmes par défaut** : Cyberpunk, Ocean, Sunset, Forest, Monochrome
 - 🎭 **Personnalisation des instances/intents** : statut, emoji, couleur
 - 🔀 **Boutons Git Clone et Merge** dans la sidebar
 - 🐛 **Corrections de bugs** et améliorations de stabilité
+
+### 🎯 Personnalisation avancée (v1.1.0)
+- **Statuts personnalisables** : créez vos propres statuts avec couleur et emoji
+- **Catégories personnalisées** : organisez vos projets avec des catégories sur mesure
+- **Autocomplétion** : les catégories personnalisées sont proposées automatiquement
+- **Couleur et emoji** par projet pour identification visuelle rapide
+- Interface de gestion via **Édition → 📂 Gérer les catégories** et **📊 Gérer les statuts**
 
 ---
 
@@ -268,7 +275,7 @@ def get_app_dir() -> Path:
         return Path(__file__).resolve().parent.parent
 ```
 
-### OAuth Device Flow (v1.0.8)
+### OAuth Device Flow (v1.1.0)
 
 Le Device Flow est le seul flux OAuth qui fonctionne sans serveur web ni callback URL.
 
@@ -282,23 +289,23 @@ Le Device Flow est le seul flux OAuth qui fonctionne sans serveur web ni callbac
 7. Sauvegarde dans config.json (token optionnellement chiffré)
 ```
 
-### Priorité des tokens (v1.0.8)
+### Priorité des tokens (v1.1.0)
 
 `core.get_effective_token(instance_path)` applique la règle :
 1. PAT spécifique à l'instance (vault de session ou config)
 2. Token OAuth du compte GitHub connecté (session mémoire)
 3. Chaîne vide (repos publics)
 
-### Cache avec functools (v1.0.7)
+### Cache avec functools (v1.1.0)
 
 Les fonctions pures (chemins, disponibilité Whirlpool) sont mises en cache via `@functools.cache` pour éviter les appels répétés au système de fichiers.  
 La configuration est mise en cache en mémoire et invalidée automatiquement à chaque écriture.
 
-### Écriture atomique de la config (v1.0.7)
+### Écriture atomique de la config (v1.1.0)
 
 `config.json` est écrit via un fichier temporaire `.tmp` puis renommé, évitant toute corruption en cas d'interruption.
 
-### Validation des noms (v1.0.7)
+### Validation des noms (v1.1.0)
 
 Chaque nom d'instance ou d'intent est validé avant création (`core.validate_name`) :
 - Non vide, ≤ 128 caractères

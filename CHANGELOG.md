@@ -7,95 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.9] - 2026-04-01
+## [1.1.0] - 2026-04-04
 
 ### 🎉 Nouvelles fonctionnalités majeures
 
-#### 📊 Statuts de projets
-- **5 statuts personnalisables** avec codes couleur :
-  - ✅ **Fini** - Vert
-  - 🔧 **À améliorer** - Orange  
-  - 🆕 **Commencé récemment** - Bleu clair
-  - 🔄 **En cours** - Bleu
-  - ❌ **Abandonné** - Rouge
-- Indicateurs visuels dans l'interface principale
-- Filtrage par statut
+#### 📊 Statuts de projets personnalisables
+- **Création de statuts personnalisés** avec ID, nom, couleur et emoji
+- **Autocomplétion** des statuts dans les champs de saisie
+- **Interface de gestion** via Édition → 📊 Gérer les statuts
+- **Rétro-compatibilité** avec les statuts par défaut existants
+- **Fusion automatique** des statuts par défaut et personnalisés
 
-#### 🏗️ Project Builder amélioré
-- **Renommage** : `Project_Builder.exe` → `ProjectsBuilder.exe`
-- **Support CLI** : `ProjectsBuilder.exe --path="chemin/du/projet"`
-- Intégration directe depuis l'interface
+#### � Catégories améliorées
+- **Autocomplétion intelligente** des catégories personnalisées
+- **Recherche insensitive** à la casse et mode contient
+- **QCompleter** avec suggestions en temps réel
+- **Intégration transparente** avec les catégories par défaut
+- **Sauvegarde automatique** dans la configuration
 
-#### 🎨 Personnalisation avancée
-- **Couleurs personnalisées** pour chaque projet
-- **Emojis et icônes** personnalisables
-- **Thèmes** par projet
-- Interface adaptable aux préférences utilisateur
+#### �️ Robustesse accrue
+- **Gestion d'erreurs Windows** "Win error : 2" améliorée
+- **Fallbacks silencieux** pour éviter les plantages
+- **Récupération automatique** en cas de problèmes de fichiers
+- **Compatibilité Nuitka** renforcée pour l'exécutable compilé
 
-#### 📁 Système de catégories
-- **Création de catégories** personnalisées
-- **Glisser-déposer** des projets entre catégories
-- Organisation hiérarchique des dossiers
-- Synchronisation avec l'explorateur Windows
-
-#### 🔐 Chiffrement de projets
-- **Chiffrement complet** du contenu des projets
-- **Algorithmes** : Whirlpool ou SHA-512
-- **Mot de passe** sécurisé avec hachage
-- **Options de rechiffrement** :
-  - Manuel via bouton
-  - Automatique à la fermeture
-
-#### ⚙️ Onglet Configuration
-- **Panneau central** pour toutes les options
-- **Export/Import** de configuration complète
-- **Sauvegarde/restauration** des préférences
-- **Paramètres avancés** de l'application
-
-### 🚀 Améliorations
+### � Améliorations
 
 #### 📋 Interface utilisateur
-- **Zone de notes** agrandie et améliorée
-- **Redimensionnement** avec la souris pour tous les panneaux
-- **Bouton "Ouvrir avec..."** pour choisir l'application
-- **Adaptation automatique** des boutons à l'espace disponible
-- **Meilleur menu d'options** réorganisé
+- **QCompleter** pour une meilleure expérience de saisie
+- **Suggestions contextuelles** dans les formulaires
+- **Gestion centralisée** des statuts et catégories
+- **Messages d'erreur** plus clairs et informatifs
 
-#### 📦 Gestion des projets
-- **Git Clone** intégré directement dans l'interface
-- **Empaquetage complet** de tous les projets en ZIP
-- **Export/import** de configuration et projets
-- **Sélection multiple** pour actions groupées
-
-#### 📝 Logs améliorés
-- **Catégorisation** des logs (Git, Système, Erreurs, etc.)
-- **Filtrage** par type et gravité
-- **Export** des logs
-- **Recherche** dans les logs
-
-### 🔧 Modifications techniques
-
-#### 🛠️ Architecture
+#### � Architecture technique
 - **Refactoring** du système de configuration
-- **Optimisation** des performances
-- **Migration** automatique depuis v1.0.8
-- **Compatibilité** ascendante maintenue
-
-#### 📚 Documentation
-- **README.md** mis à jour pour v1.0.9
-- **Nouvelle section** de personnalisation
-- **Guide** de chiffrement
-- **Exemples** d'utilisation avancée
+- **Fonctions utilitaires** pour les statuts personnalisés
+- **Gestion d'exceptions** Windows spécifiques
+- **Cache optimisé** pour les performances
 
 ### 🐛 Corrections
 
-- Correction de bugs mineurs d'affichage
-- Stabilisation de la connexion GitHub
-- Optimisation de la mémoire
+- Correction de l'erreur "Win error : 2" après compilation
+- Stabilisation de l'accès aux fichiers de configuration
+- Amélioration de la gestion des permissions Windows
+- Optimisation de la mémoire et des performances
 
 ---
 
-## [1.0.8] - 2025-XX-XX
+## [1.0.8] - 2026-XX-XX
 
 ### 🐙 Connexion compte GitHub
 - OAuth Device Flow (sans coller de token)
@@ -110,8 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.7] - 2025-XX-XX
-
+## [1.0.7] - 2026-XX-XX
 ### ✨ Fonctionnalités
 - Emplacement de stockage personnalisable
 - Diagnostic automatique au démarrage
@@ -125,7 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.6] - 2025-XX-XX
+## [1.0.6] - 2026-XX-XX
 
 - Push avancé multi-branches
 - Chiffrement token PAT Whirlpool + XOR
@@ -133,6 +91,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.5] - 2025-XX-XX
+## [1.0.5] - 2026-XX-XX
 
 - Version initiale publique
