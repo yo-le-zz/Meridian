@@ -1,354 +1,150 @@
-# ✦ Meridian — Project Instance Manager v1.1.0
+﻿# ✦ Meridian — Project Instance Manager v1.1.2
 
-> **Gestionnaire de dossiers de projets pour Windows.**  
-> Créez, organisez et versionez vos instances et intents sur n'importe quel disque,  
-> avec intégration GitHub, export/import ZIP, chiffrement des tokens PAT et thèmes personnalisés.
-> 
-> **Auteur : yo-le-zz**  
-> **Version : 1.1.0**  
+> Gestionnaire d'instances et d'intents pour Windows avec intégration GitHub, export ZIP, notes auto, thèmes, panneau de détails et cache de performances.
 
 ---
 
-## Architecture du projet
+## Structure du projet
 
-```
+`	ext
 Meridian/
 ├── src/
-│   ├── main.py       → Point d'entrée
-│   ├── window.py     → Interface PySide6
-│   └── core.py       → Logique métier
-│
+│   ├── main.py
+│   ├── window.py
+│   ├── core.py
+│   ├── config_dialog.py
+│   ├── customize_dialog.py
+│   ├── encrypt_dialog.py
+│   ├── categories_dialog.py
+│   ├── status_dialog.py
+│   ├── theme_dialog.py
+│   ├── theme_manager.py
+│   ├── zip_functions.py
+│   └── custom_theme_dialog.py
 ├── assets/
-│   └── icon.ico      → Icône de l'application
-│
-├── data/             → Créé automatiquement à côté du script / de l'exe
-│   ├── config.json   → Registre de toutes les instances et intents
-│   ├── config.json.bak → Sauvegarde automatique avant réparation
-│   └── backups/      → Archives .zip exportées automatiquement
-│
-├── dist/             → Sortie de compilation Nuitka
+│   └── icon.ico
+├── data/
+│   ├── config.json
+│   └── backups/
+├── dist/
+├── env/
 └── README.md
-```
+` 
 
-> **`data/` est toujours à côté de l'exécutable** — en mode développement comme en mode compilé Nuitka.
-
----
-
-## Architecture sur le disque externe (par défaut)
-
-```
-D:\Meridian\
-├── Instances\
-│   ├── MonProjet\        ← dossier vide, l'utilisateur fait ce qu'il veut
-│   └── AutreProjet\
-│
-└── Intents\
-    ├── SearchIntent\
-    └── WelcomeIntent\
-```
-
-> En v1.1.0+, ces chemins sont entièrement personnalisables depuis **⚙ Paramètres → Emplacement de stockage**.
+> data/ est créé automatiquement à côté de l'exécutable ou du script Python.
 
 ---
 
-## Installation & lancement
+## Installation
 
-```bash
+```powershell
 pip install PySide6
 python src/main.py
 ```
 
----
-
-## Fonctionnalités
-
-### Instances et Intents
-- Créer un dossier vide (instance ou intent) sur le disque de son choix **ou dans un dossier personnalisé**
-- Supprimer définitivement
-- **Exporter** en `.zip` (backup auto dans `data/backups/` ou dossier personnalisé)
-- **Importer** depuis un `.zip`
-- Ouvrir dans l'Explorateur Windows
-- Ouvrir un terminal `cmd` positionné sur le dossier
-- Ouvrir VS Code dans le dossier
-
-### Connexion compte GitHub (v1.1.0) 🆕
-- **Connexion via OAuth Device Flow** — aucun token à coller, authentification dans le navigateur
-- Le compte connecté apparaît dans la sidebar avec son login GitHub
-- **Token OAuth réutilisé automatiquement** pour toutes les instances liées à GitHub
-- Option de protection du token OAuth par mot de passe (Whirlpool + XOR)
-- Déconnexion propre depuis la sidebar ou le menu **🐙 GitHub**
-- Restauration automatique de la session au démarrage
-
-#### Priorité des tokens lors d'un push
-| Situation | Token utilisé |
-|---|---|
-| Instance avec PAT spécifique | PAT de l'instance (prioritaire) |
-| Instance sans PAT + compte connecté | Token OAuth du compte GitHub |
-| Aucun token | Push en mode public uniquement |
-
-### GitHub (instances uniquement)
-- Lier un repository GitHub (sauvegardé dans `data/config.json`)
-- Git Init local
-- Push initial complet (`add`, `commit`, `remote add`, `push`)
-- Commit & Push avancé vers une ou plusieurs branches simultanées
-- Options : `--force`, `--follow-tags`, `--no-verify`
-- Option : lier sans pousser (décocher "Push initial")
-- Chiffrement du token PAT : Whirlpool + XOR (SHA-512 en fallback)
-- Dialog de configuration affiche le compte OAuth connecté si disponible
-
-### Emplacement de stockage personnalisé (v1.1.0)
-- Choisir un dossier arbitraire pour stocker les Instances et les Intents
-- Indépendant du disque sélectionné dans la barre latérale
-- Configurable via **⚙ Paramètres → Emplacement de stockage**
-- Rétro-compatible : laisser vide pour garder le comportement `{Disque}\Meridian\...`
-
-### Diagnostic & Réparation automatique (v1.1.0+)
-Détection automatique de problèmes au démarrage et via **⚙ Paramètres → Lancer un diagnostic** :
-
-| Problème détecté | Catégorie | Action automatique |
-|---|---|---|
-| `config.json` corrompu ou illisible | `config` | Réparation avec récupération des données |
-| Entrées pointant vers des dossiers absents | `data` | Suppression des entrées orphelines |
-| `git` absent du PATH | `dependency` | Lien vers le téléchargement |
-| `PySide6` manquant | `dependency` | Réinstallation via `pip` |
-| Client ID OAuth non configuré | `config` | Avertissement (v1.1.0) |
-
-### Project Builder
-- Lance `Project_Builder.exe` dans un terminal `cmd`
-- Répertoire de travail positionné sur le dossier sélectionné
+> Cette application est développée pour Windows et utilise PySide6 pour l'interface graphique.
 
 ---
 
-## Configuration de l'OAuth GitHub (v1.1.0)
+## Fonctionnalités principales
 
-### 1. Créer une OAuth App
+### 🚀 Gestion des projets
+- **Création** d'instances et d'intents avec validation de noms sécurisée
+- **Renommage** et **suppression** de projets (suppression en arrière-plan pour les gros dossiers)
+- **Ouverture rapide** dans l'Explorateur Windows, un terminal ou VS Code
+- **Export ZIP** individuel ou global vers data/backups/ ou dossier personnalisé
+- **Import ZIP** avec restauration complète des projets
+- **Détection automatique** du langage de programmation
 
-1. Allez sur https://github.com/settings/developers
-2. Cliquez **"New OAuth App"**
-3. Remplissez :
-   - **Application name** : Meridian
-   - **Homepage URL** : `http://localhost` (non utilisée)
-   - **Authorization callback URL** : `http://localhost` (non utilisée avec Device Flow)
-4. Cochez **"Enable Device Flow"** (important !)
-5. Cliquez **"Register application"**
-6. Copiez le **Client ID** affiché
+### 🎨 Personnalisation avancée
+- **Couleur personnalisée** par projet avec palette de couleurs
+- **Emoji** associé à chaque projet pour identification visuelle
+- **Catégories** personnalisées avec autocomplétion intelligente
+- **Statuts** personnalisables avec emoji, couleur et nom (Fini, En cours, À améliorer, etc.)
+- **Langage** de programmation par projet avec détection automatique
 
-### 2. Configurer Meridian
+### 📊 Panneau Détails du projet
+- **Affichage complet** : type, statut, langage, catégorie, repo Git, branche, source du token, date de création et chemin
+- **Interface togglable** pour masquer/afficher les détails selon l'espace disponible
+- **Mise à jour en temps réel** lors de la sélection d'un projet
 
-Ouvrez `src/core.py` et remplacez :
+### 📝 Notes et sauvegarde automatique
+- **Éditeur de notes** intégré pour chaque instance ou intent avec support du formatage
+- **Sauvegarde manuelle** via bouton dédié
+- **Auto-save configurable** avec intervalle utilisateur en secondes
+- **Restauration automatique** des notes au lancement
 
-```python
-GITHUB_CLIENT_ID = "Iv23liYOUR_CLIENT_ID"   # ← À remplacer
-```
+### 🐙 Intégration Git et GitHub complète
+- **OAuth Device Flow** : connexion GitHub sans copier/coller de token
+- **Gestion des tokens** : PAT par instance, token OAuth global, accès public
+- **Opérations Git** : clone, init, push (multi-branches), pull, status, log, checkout
+- **Configuration de repo** avec branches multiples
+- **Protection des tokens** par mot de passe avec chiffrement Whirlpool + XOR
+- **Compte GitHub** avec avatar et informations de profil
 
-par votre Client ID :
+### 🔒 Sécurité et chiffrement
+- **Chiffrement** des projets avec algorithme robuste
+- **Protection** des tokens GitHub par mot de passe
+- **Vault de session** pour les tokens temporaires
+- **Suppression sûre** avec confirmation et barre de progression
 
-```python
-GITHUB_CLIENT_ID = "Iv23liAbCdEfGhIjKl"    # ← Votre vrai Client ID
-```
+### 🎯 Performance et cache
+- **Préchargement en cache** des instances et intents pour un accès instantané
+- **Suppression en arrière-plan** des gros dossiers sans bloquer l'interface
+- **Cache functools** pour les opérations répétitives
+- **Interface fluide** sans temps de chargement perceptible
 
-> ⚠  Ne générez **pas** de Client Secret — le Device Flow n'en a pas besoin.  
-> ⚠  Ne committez pas votre Client ID dans un repo public.
+### 🛠️ Outils intégrés
+- **Projects Builder** : lancement externe pour compilation de projets
+- **Terminal intégré** : ouverture directe dans le dossier du projet
+- **Explorateur Windows** : accès rapide au système de fichiers
+- **Diagnostic automatique** au démarrage avec rapport de santé
 
-### Scopes demandés
-`repo` — accès complet aux repos publics et privés (lecture + écriture).
+### ⚙️ Configuration complète
+- **Thèmes** personnalisables avec support des thèmes sombres/clair
+- **Police** et taille de l'interface personnalisables
+- **Emplacements** de stockage personnalisés pour Instances et Intents
+- **Options** de confirmation de suppression
+- **Export/import** de la configuration au format JSON
+- **Migration** automatique entre versions
 
----
+### 🎨 Thèmes et apparence
+- **Gestionnaire de thèmes** avec création de thèmes personnalisés
+- **Thème sombre** par défaut avec design moderne
+- **Personnalisation** des couleurs de l'interface
+- **Support** des thèmes utilisateur
 
-## Chemin du Project Builder
-
-```
-D:\my programme\Project_builder\Project_Builder.exe
-```
-
-Pour modifier : éditer `PROJECT_BUILDER` dans `src/core.py`.
-
----
-
-## Compilation Nuitka v1.1.0
-
-### 🚀 Script PowerShell recommandé
-
-Utilisez le script `compile.ps1` pour une compilation complète et automatisée :
-
-```powershell
-.\compile.ps1
-```
-
-Le script inclut automatiquement :
-- ✅ Activation de l'environnement virtuel
-- ✅ Installation des dépendances
-- ✅ Compilation avec tous les modules nécessaires
-- ✅ Copie des assets
-- ✅ Test de l'exécutable
-- ✅ Informations de version et auteur
-
-### 🛠️ Compilation manuelle
-
-```powershell
-# Activer l'environnement virtuel
-& "venv\Scripts\Activate.ps1"
-
-# Compiler avec Nuitka
-python -m nuitka `
-  --standalone `
-  --remove-output `
-  --enable-plugin=pyside6 `
-  --windows-icon-from-ico=assets/icon.ico `
-  --windows-console-mode=attach `
-  --output-dir=dist `
-  --output-filename=Meridian.exe `
-  --include-data-dir=assets=assets `
-  --include-module=core `
-  --include-module=theme_manager `
-  --include-module=custom_theme_dialog `
-  --include-module=theme_dialog `
-  --include-module=window `
-  --include-module=config_dialog `
-  --include-module=categories_dialog `
-  --include-module=customize_dialog `
-  --include-module=encrypt_dialog `
-  --include-module=github_dialog `
-  --include-module=git_dialog `
-  --include-module=push_dialog `
-  --include-module=token_dialog `
-  --include-module=uninstall_dialog `
-  --include-module=diagnostic_dialog `
-  --include-module=storage_dialog `
-  --follow-imports `
-  src/main.py
-
-# Copier les assets
-Copy-Item -Path "assets" -Destination "dist\assets" -Recurse -Force
-```
-
-### 📋 Actions post-compilation
-
-Après compilation, copiez manuellement :
-
-```
-dist/
-├── Meridian.exe          (créé par compilation)
-├── assets/               (copié automatiquement)  
-├── src/themes/           (À COPIER MANUELLEMENT)
-└── data/                 (sera créé automatiquement)
-```
-
-### ⚙️ Pré-requis
-
-```bash
-pip install nuitka PySide6
-```
-
-Compilateur C requis : **Visual Studio Build Tools** ou **MinGW-w64**.
-
-### 🎯 Nouveautés v1.1.0
-
-- 🎨 **Système de thèmes personnalisés** avec création, modification et suppression
-- 🌈 **5 thèmes par défaut** : Cyberpunk, Ocean, Sunset, Forest, Monochrome
-- 🎭 **Personnalisation des instances/intents** : statut, emoji, couleur
-- 🔀 **Boutons Git Clone et Merge** dans la sidebar
-- 🐛 **Corrections de bugs** et améliorations de stabilité
-
-### 🎯 Personnalisation avancée (v1.1.0)
-- **Statuts personnalisables** : créez vos propres statuts avec couleur et emoji
-- **Catégories personnalisées** : organisez vos projets avec des catégories sur mesure
-- **Autocomplétion** : les catégories personnalisées sont proposées automatiquement
-- **Couleur et emoji** par projet pour identification visuelle rapide
-- Interface de gestion via **Édition → 📂 Gérer les catégories** et **📊 Gérer les statuts**
+### 📋 Interface utilisateur
+- **Menu barre** complet avec raccourcis pour toutes les fonctionnalités
+- **Sidebar** avec navigation rapide et informations système
+- **Listes** d'instances et intents avec recherche et filtrage
+- **Panneau de logs** pour le suivi des opérations
+- **Interface responsive** avec support HiDPI
 
 ---
 
-## Architecture technique
-
-### Détection Nuitka vs mode script
-
-`core.py` détecte automatiquement l'environnement :
-
-```python
-@functools.cache
-def get_app_dir() -> Path:
-    try:
-        _ = __compiled__          # Variable injectée par Nuitka
-        return Path(sys.executable).parent
-    except NameError:
-        return Path(__file__).resolve().parent.parent
-```
-
-### OAuth Device Flow (v1.1.0)
-
-Le Device Flow est le seul flux OAuth qui fonctionne sans serveur web ni callback URL.
-
-```
-1. POST /login/device/code       → device_code + user_code + verification_uri
-2. Affichage du user_code dans l'UI
-3. L'utilisateur visite verification_uri et entre le code
-4. Sondage de POST /login/oauth/access_token toutes les N secondes
-5. Réponse : access_token (token OAuth)
-6. GET /api/user                 → login, name, avatar_url
-7. Sauvegarde dans config.json (token optionnellement chiffré)
-```
-
-### Priorité des tokens (v1.1.0)
-
-`core.get_effective_token(instance_path)` applique la règle :
-1. PAT spécifique à l'instance (vault de session ou config)
-2. Token OAuth du compte GitHub connecté (session mémoire)
-3. Chaîne vide (repos publics)
-
-### Cache avec functools (v1.1.0)
-
-Les fonctions pures (chemins, disponibilité Whirlpool) sont mises en cache via `@functools.cache` pour éviter les appels répétés au système de fichiers.  
-La configuration est mise en cache en mémoire et invalidée automatiquement à chaque écriture.
-
-### Écriture atomique de la config (v1.1.0)
-
-`config.json` est écrit via un fichier temporaire `.tmp` puis renommé, évitant toute corruption en cas d'interruption.
-
-### Validation des noms (v1.1.0)
-
-Chaque nom d'instance ou d'intent est validé avant création (`core.validate_name`) :
-- Non vide, ≤ 128 caractères
-- Sans caractères réservés Windows : `\ / : * ? " < > |`
-- Sans séquences de traversée de chemin (`..`)
-
-### Rétro-compatibilité
-
-`config.json` est migré automatiquement depuis toutes les versions antérieures :
-- v1.0.5 → v1.0.6 : ajout de `github_branches`, `github_token_protected`
-- v1.0.6 → v1.0.7 : ajout de `storage`, `_schema_version`
-- v1.0.7 → v1.0.8 : ajout de `github_account` (session OAuth)
+## Fichiers importants
+- src/main.py : point d'entrée de l'application.
+- src/window.py : interface graphique principale et logique de navigation.
+- src/core.py : logique métier, gestion de la config, Git, export ZIP, OAuth, notes et projet.
+- src/config_dialog.py : paramètres globaux de l'application.
+- src/customize_dialog.py : personnalisation des projets.
+- src/zip_functions.py : export/import ZIP.
+- assets/icon.ico : icône de l'application.
+- data/config.json : configuration utilisateur et liste des projets.
 
 ---
 
-## Changelog
+## Notes de version
+- Version actuelle : **1.1.2**
+- Voir CHANGELOG.md pour l'historique complet des versions et des améliorations.
 
-### v1.0.8
-- 🐙 **Connexion compte GitHub** via OAuth Device Flow (sans coller de token)
-- 🔑 Token OAuth persisté dans `config.json` (chiffrable par mot de passe)
-- 🔄 Restauration automatique de la session au démarrage
-- 🃏 Carte de compte GitHub dans la sidebar (login, statut, déconnexion)
-- 📋 Indicateur de source du token dans le panneau d'instance
-- ⚡ `get_effective_token()` : priorité PAT instance > OAuth global
-- 🩺 Avertissement diagnostic si `GITHUB_CLIENT_ID` non configuré
-- 🔒 Token OAuth optionnellement chiffré (même algo Whirlpool + XOR)
-- 🧵 `OAuthPollWorker` : sondage non-bloquant dans un QThread dédié
-- Migration automatique `config.json` vers schéma v3
+---
 
-### v1.0.7
-- ✨ Emplacement de stockage personnalisable (instances et intents)
-- 🩺 Diagnostic automatique au démarrage + réparation guidée
-- 🔐 Validation des noms (sécurité anti path-traversal)
-- ⚡ Cache `functools` pour les fonctions pures
-- 💾 Écriture atomique de `config.json` (résistance aux crashs)
-- 🧹 Suppression des magic numbers (constantes nommées)
-- 🔄 Migration automatique depuis toutes les versions antérieures
-- 🛠 Refactoring : `_find_entry` / `_update_entry` / `_get_note` / `_set_note`
+## Compilation Nuitka (optionnelle)
 
-### v1.0.6
-- Push avancé multi-branches (GitQueue)
-- Chiffrement token PAT Whirlpool + XOR
-- Dialog de push avec options avancées
+Le projet contient un environnement env/ et peut être compilé avec Nuitka si vous souhaitez générer un exécutable Windows.
 
-### v1.0.5
-- Version initiale publique
+---
+
+**Merci d'utiliser Meridian.**

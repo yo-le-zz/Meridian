@@ -7,7 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-04-04
+## [1.1.2] - 2026-04-13
+
+### 🚀 Nouvelles fonctionnalités
+
+- **Cache de performances** : préchargement des instances et intents pour un accès instantané
+- **Optimisation du chargement** : plus de temps d'attente lors de la sélection des projets
+- **Interface fluide** : suppression des délais de 2 secondes lors du chargement des données
+
+### ⚡ Améliorations
+
+- **Cache en mémoire** des données des projets pour accès rapide
+- **Préchargement intelligent** au démarrage de l'application
+- **Optimisation des performances** générales de l'interface
+- **Mise à jour complète** du README avec toutes les fonctionnalités
+
+### 🐛 Corrections
+
+- Amélioration de la réactivité de l'interface utilisateur
+- Optimisation de l'utilisation mémoire
+
+---
+
+## [1.2.0] - 2026-04-12
+
+### 🎉 Nouvelles fonctionnalités
+
+- **Nouvelle colonne Détails du projet** : affiche le type, statut, langage, catégorie, repo Git, branche, source du token et chemin.
+- **Afficher/Masquer le panneau Détails** à côté du journal de logs.
+- **Auto-save des notes** paramétrable depuis les paramètres, avec intervalle utilisateur en secondes.
+- **Suppression de dossiers en arrière-plan** : suppression en thread non bloquant et barre de progression.
+
+### 🛠 Améliorations
+
+- Ajout du champ `language` aux projets et intents.
+- Détection automatique du langage du projet si aucun langage n'est renseigné.
 
 ### 🎉 Nouvelles fonctionnalités majeures
 
